@@ -1,0 +1,127 @@
+[이병재 수석님 미팅1차]
+
+통합감지센서 전달받음.
+*** 좋았던 멘트 ("사실상 플랫폼이나 프레임워크를 활용할 때는, 사사로운 코드작성을 피하기 위해 만들어 져 있기 때문에, 해당 플랫폼을 잘 이해하는 것이 중요하다. 그 후에 코드를 삽입할 부분에 삽입하면 된다.") ***
+
+TAS <-> nCube Thyme <-> Movius
+
+- TAS는 따로 설계할 필요 없음. 통합감지센서에서 자체적으로 https통신. Thyeme에서 Rest API 호출만 잘해주면 됨.
+
+-  nCube Thyeme  node.js 버전으로 설치. tas_sample 예제보고 플랫폼 이해요함. 타이머 설정해줘야함. Json parsing 해줘야함.(???) 
+
+- Mobius DB에 각 테이블 대한 이해해야함. 
+ex) cin table: 타임에서 수신받은 정보 쌓이는곳. con-생성데이터
+ae table: Thyme의 정보 올라감
+
+다음번 미팅까지 해야할 일
+1.모비우스 플랫폼에 대한 이해.(대부분 기본설정이 되어 있어서 따로 코딩해 줄 필요가 없다. 실제로 코딩하는 양은 몇줄안될것. 따라서 플랫폼에 대해 이해를 완료해야 활용할 수 있음.)
+2. 타스,타임,모비우스 연결 후 데이터가 올라가는지 확인!
+
+
+
+
+
+
+
+======================================================================
+[이병재 교수님 미팅 2,3차]
+
+[Mobius 기본틀]
+TAS - Thyme - Mobius
+
+1) Mobius 구동한다. Mobius-Mysql이랑 연동되는지 확인! 
+(Mobius DB 'cb'테이블에 내 Mobius 정보가 들어간다.)
+
+2) Mobius-Thyme 연동한다. 
+(Mobius DB 'ae'테이블에 내 Thyme 정보가 들어간다. / 'cnt'테이블에 데이터 들어가려하는 데이터껍데기 정보가 들어간다.) 
+
+3) Thyme-TAS 연동한다.
+(Mobius DB 'cin'테이블에 정보 들어간다.)
+
+__________________
+- Tas는 파일 하나밖에 없다!
+
+- cse는 Mobius를 쳐다보는 정보이다.
+
+- ???????? 
+json파싱 
+conf.js에 //build cnt 안에 내용을~~~~
+
+_________________
++참고할 문서
+1. nCube-Thyme-Nodejs 폴더 내에 doc문서
+2. Mobius 폴더 내에 doc문서
+(사실상, 옛날버전으로 만들어 져서 수정해 줘야 할 사항들이 많음...)
+ - Mysql 5.7버전 기준으로 작성된 것이라, 현재 8.0버전이므로 호환안됨..... 따라서 삭제하고 다시 깔았음. 설치할 때, 이전버전 호환되게 하는 설정이 있음. 그거체크하면 됨.
+ - Node.js 옛날 버전기준이라 수정해줘야 할 사항 있음. 밑에 건드린파일 보면 나와있음.
+
+_________________
++건드린 파일 
+
+[Mobius폴더]
+ - conf.json에서 dbpass에 mysql 비밀번호 입력
+ 
+[nCube-Thyme-Nodejs 폴더]
+ - conf.js에서 cse.host변경. terminal 창에서 Mobius구동시에 밑에 서버주소 뜸!
+(참고로, cse란 Mobius를 쳐다보는 정보이다.)
+ - tas_sample/tas_co2/package.json에서 serialport="^7.0.0"으로 변경 (node.js 버전 바껴서 그렇다 함...)
+ - tas_sample/tas_co2/app.js에서 위에 var serialport를 var SerialPort로 변경 & serialport검색해서 2개 주석처리해줌 (하나는 // 다른하나는 /**/)
+ - conf.js에서 ~~~~
+
+ - tas_sample/tas_co2/app.js에 맨 밑에다가 코드 넣어줌! (sme20센서 데이터값 받아오기 위해...)
+https://documenter.getpostman.com/view/527712/SW14WcyW?version=latest#9b1079ca-8760-457f-8e38-bb8f6b8ef6ad 
+여기 나와 있는 코드 복붙!
+
+________________
++구동순서
+
+0. 파일들 다 수정하고 npm install 다 해줬다는 가정하에...
+1. terminal 3개 킴. (Mobius 폴더, nCube-Thyme-Nodejs 폴더, tas_co2 폴더)
+2. (Mobius) node mobius.js 입력! (이때, 뜨는 서버주소 복사해서 cse.host에 복붙)
+3. (Thyme) node thyme.js 입력! (입력과 동시에 Mobius-Thyme연동 확인)
+4. (TAS) node app.js 입력! 
+
+________________
+해야할 일
+ - 센서 전원연결하기.(센서 사진 동현이한테 보내기)
+ - Mobius DB 테이블 설명해 주기 (동현쉨한테)
+ - conf.js에서 주석처리된 부분 찾아서 TAS-Thyme 연동되는지 확인해야함.(DB cin 테이블에 정보가 들어가지면 둘이 잘 연동되는것임!)
+
+
+
+
+
+
+
+======================================================================
+[이병재 수석님 미팅 4차]
+
+최종 정리..
+ - 일단 tas_sample 진행해봤음. timer 구동되는것 확인했고 cin table에 정보 들어가는 것 확인함. 고로, TAS-Thyme-Mobius 연동 확인!
+ - 이제 timer따위 없애고, 우리가 이용할 통합감지센서(sme-20u)데이터 불러와야함. 이부분에서 피드백 받음
+
+ - 이전에 추가해줬던 통합감지센서 api코드를 수정해야한다. (본코드가 response.body)
+  * 원하는 device_scode 번호를 받아오는 코드 추가.
+  * json 파싱.
+  * 이것에 따른 정보들을 다 조금씩 변형시켜줘야한다. (conf.js, conf.xml)
+
+_________________
+수정한 부분
+[nCube-Thyme-Nodejs-2.3.2]
+
+/conf.js
+ - build cnt 부분: 필요없는부분 다 날리고 cnt-@@@
+ - build sub 부분: 필요없는부분 다 날림 (sub는 led나 alarm 등 제어할때 쓰는것!)
+
+/tas_sample/tas_co2
+./conf.xml
+ - <upload>안에 <ctname> 알맞게 고치고, <id> 값 고침 
+   (ctname은 conf.js에 들어가는 이름이랑 같게, id는 app.js에 들어가는 이름이랑 같)
+ 
+./app.js
+ - 맨 밑에 sme20u_upload_action함수 추가 (node js json 파싱!!!!)
+ - 중간에 wdt.set_wdt 함수 추가 (중간에 인수로 들어가는 숫자는 '초')
+_________________
+해야할 일
+ - 통합감지센서(sme-20u)가 받아온 tvoc값이 일정한값(예를들면, 100) 이상이면 경고를 해주는 장치 제작!
+
